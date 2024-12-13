@@ -64,3 +64,7 @@ for h_i in range(border, height + border):
 
 # Release the VideoWriter object
 out.release()
+
+# Display the final image
+plt.imshow(im)
+plt.show()
