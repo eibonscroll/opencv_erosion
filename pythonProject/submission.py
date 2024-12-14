@@ -31,40 +31,40 @@ height,width = im.shape[:2]
 
 ErodedEllipseKernel = cv2.erode(im, element)
 print(ErodedEllipseKernel)
-plt.imshow(ErodedEllipseKernel);
+plt.imshow(ErodedEllipseKernel)
 
-border = ksize//2
-paddedIm = np.zeros((height + border*2, width + border*2))
-paddedIm = cv2.copyMakeBorder(im, border, border, border, border, cv2.BORDER_CONSTANT, value = 1)
+border = ksize // 2
+paddedIm = np.zeros((height + border * 2, width + border * 2))
+paddedIm = cv2.copyMakeBorder(im, border, border, border, border, cv2.BORDER_CONSTANT, value=1)
 paddedErodedIm = paddedIm.copy()
 # Create a VideoWriter object
 # Use frame size as 50x50
+###
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter('erosion_steps.avi', fourcc, 1.0, (50, 50), isColor=True)
-
+out = cv2.VideoWriter('erosionScratch.avi', fourcc, 10.0, (50, 50))
+###
 for h_i in range(border, height + border):
     for w_i in range(border, width + border):
-        # When you find a white pixel
-        if im[h_i - border, w_i - border]:
+        if paddedIm[h_i, w_i]:
             print("White Pixel Found @ {},{}".format(h_i, w_i))
 
-            # Perform AND operation with the kernel
             neighborhood = paddedIm[h_i - border: (h_i + border) + 1, w_i - border: (w_i + border) + 1]
             and_result = cv2.bitwise_and(neighborhood, element)
 
-            # Replace the pixel value with the minimum value in the neighborhood
             min_value = np.min(and_result)
-            im[h_i - border, w_i - border] = min_value
+            paddedErodedIm[h_i, w_i] = min_value
 
-            # Resize output to 50x50 before writing it to the video
             resized_im = cv2.resize(im * 255, (50, 50), interpolation=cv2.INTER_NEAREST)
-            # Convert resizedFrame to BGR before writing
             bgr_im = cv2.cvtColor(resized_im, cv2.COLOR_GRAY2BGR)
             out.write(bgr_im)
 
 # Release the VideoWriter object
 out.release()
 
-# Display the final image
-plt.imshow(im)
+# Display final image (cropped)
+croppedErodedIm = paddedErodedIm[border:-border, border:-border]
+
+plt.imshow(croppedErodedIm, cmap='gray')
+plt.title('Cropped Final Eroded Image')
 plt.show()
+
