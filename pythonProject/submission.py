@@ -34,8 +34,8 @@ print(ErodedEllipseKernel)
 plt.imshow(ErodedEllipseKernel)
 
 border = ksize // 2
-paddedIm = np.zeros((height + border * 2, width + border * 2))
-paddedIm = cv2.copyMakeBorder(im, border, border, border, border, cv2.BORDER_CONSTANT, value=1)
+#paddedIm = np.zeros((height + border * 2, width + border * 2))
+paddedIm = cv2.copyMakeBorder(im, border, border, border, border, cv2.BORDER_CONSTANT, value=0)
 paddedErodedIm = paddedIm.copy()
 # Create a VideoWriter object
 # Use frame size as 50x50
@@ -49,12 +49,12 @@ for h_i in range(border, height + border):
             print("White Pixel Found @ {},{}".format(h_i, w_i))
 
             neighborhood = paddedIm[h_i - border: (h_i + border) + 1, w_i - border: (w_i + border) + 1]
-            and_result = cv2.bitwise_and(neighborhood, element)
+            and_result = cv2.bitwise_or(neighborhood, element)
 
             min_value = np.min(and_result)
             paddedErodedIm[h_i, w_i] = min_value
 
-            resized_im = cv2.resize(im * 255, (50, 50), interpolation=cv2.INTER_NEAREST)
+            resized_im = cv2.resize(paddedErodedIm * 255, (50, 50), interpolation=cv2.INTER_NEAREST)
             bgr_im = cv2.cvtColor(resized_im, cv2.COLOR_GRAY2BGR)
             out.write(bgr_im)
 
